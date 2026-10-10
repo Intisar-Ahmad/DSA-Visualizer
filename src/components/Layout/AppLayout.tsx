@@ -1,16 +1,20 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { EditorPanel } from '../Editor/EditorPanel';
 import { CallStack } from '../Visualizer/CallStack';
 import { ExecutionContext } from '../Visualizer/ExecutionContext';
+import { HeapPanel } from '../Visualizer/HeapPanel';
 import { ConsolePanel } from '../Visualizer/ConsolePanel';
 import { Controls } from '../Controls/Controls';
+import { AlgoVisualizer } from '../Visualizer/AlgoVisualizer';
 import { useExecutionStore } from '../../store/executionStore';
-import { HeapPanel } from '../Visualizer/HeapPanel';
+
+type ViewMode = 'memory' | 'visual';
 
 export function AppLayout() {
   const { currentStep } = useExecutionStore();
   const headerRef = useRef<HTMLDivElement>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>('memory');
 
   useEffect(() => {
     if (headerRef.current) {
@@ -45,6 +49,30 @@ export function AppLayout() {
             </div>
           </div>
         </div>
+
+        {/* View Toggle */}
+        <div className="flex bg-black/40 p-1 rounded-lg border border-white/10">
+          <button
+            onClick={() => setViewMode('memory')}
+            className={`px-3 py-1.5 text-xs font-mono rounded-md transition-all duration-200 cursor-pointer ${
+              viewMode === 'memory' 
+                ? 'bg-blue-500/20 text-blue-300 shadow-[0_0_10px_rgba(59,130,246,0.2)]' 
+                : 'text-white/40 hover:text-white/70'
+            }`}
+          >
+            Memory Grid
+          </button>
+          <button
+            onClick={() => setViewMode('visual')}
+            className={`px-3 py-1.5 text-xs font-mono rounded-md transition-all duration-200 cursor-pointer ${
+              viewMode === 'visual' 
+                ? 'bg-purple-500/20 text-purple-300 shadow-[0_0_10px_rgba(168,85,247,0.2)]' 
+                : 'text-white/40 hover:text-white/70'
+            }`}
+          >
+            AlgoCanvas
+          </button>
+        </div>
       </header>
 
       {/* Main content */}
@@ -58,24 +86,33 @@ export function AppLayout() {
         </div>
 
         {/* Right: Visualizer panels */}
-         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-          {/* Top row: Call Stack, Context, Heap */}
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden bg-[#050608]">
+          
+          {/* Top row: Dynamic Toggle Area */}
           <div className="flex h-[70%] border-b border-white/8 min-h-0">
-            <div className="w-1/3 border-r border-white/8 p-4 min-h-0 overflow-hidden">
-              <CallStack
-                entries={currentStep?.callStack ?? []}
-                isAnimating={!!currentStep}
-              />
-            </div>
-            <div className="w-1/3 border-r border-white/8 p-4 min-h-0 overflow-hidden">
-              <ExecutionContext frames={currentStep?.executionContext ?? []} />
-            </div>
-            <div className="w-1/3 p-4 min-h-0 overflow-hidden">
-              <HeapPanel heap={currentStep?.heap ?? {}} />
-            </div>
+            {viewMode === 'memory' ? (
+              <>
+                <div className="w-1/3 border-r border-white/8 p-4 min-h-0 overflow-hidden">
+                  <CallStack
+                    entries={currentStep?.callStack ?? []}
+                    isAnimating={!!currentStep}
+                  />
+                </div>
+                <div className="w-1/3 border-r border-white/8 p-4 min-h-0 overflow-hidden">
+                  <ExecutionContext frames={currentStep?.executionContext ?? []} />
+                </div>
+                <div className="w-1/3 p-4 min-h-0 overflow-hidden">
+                  <HeapPanel heap={currentStep?.heap ?? {}} />
+                </div>
+              </>
+            ) : (
+              <div className="w-full p-4 min-h-0 overflow-hidden">
+                <AlgoVisualizer heap={currentStep?.heap ?? {}} context={currentStep?.executionContext ?? []} />
+              </div>
+            )}
           </div>
 
-          {/* Bottom row: Console */}
+          {/* Bottom row: Console remains intact */}
           <div className="flex h-[30%] min-h-0">
             <div className="flex-1 p-4 min-h-0 overflow-hidden">
               <ConsolePanel output={currentStep?.consoleOutput ?? []} />
@@ -86,5 +123,3 @@ export function AppLayout() {
     </div>
   );
 }
-
-
