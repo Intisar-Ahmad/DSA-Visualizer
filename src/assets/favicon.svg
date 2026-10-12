@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <!-- Dark background matching your #0a0c14 theme with a subtle blue stroke -->
+  <rect x="5" y="5" width="110" height="110" rx="28" fill="#0a0c14" stroke="#2563eb" stroke-width="4" />
+  
+  <!-- Subtle glowing effect behind the nodes -->
+  <circle cx="60" cy="60" r="35" fill="#3b82f6" opacity="0.15" filter="blur(10px)" />
+
+  <!-- Connecting Edges -->
+  <path d="M60 30 L30 80 L90 80 Z" fill="none" stroke="#4b5563" stroke-width="6" stroke-linejoin="round" />
+  <line x1="60" y1="30" x2="60" y2="65" stroke="#4b5563" stroke-width="6" stroke-linecap="round" />
+
+  <!-- Nodes (Emerald, Pink, Blue) -->
+  <circle cx="60" cy="30" r="12" fill="#ec4899" /> <!-- Top Node: Pink -->
+  <circle cx="30" cy="80" r="12" fill="#10b981" /> <!-- Left Node: Emerald -->
+  <circle cx="90" cy="80" r="12" fill="#3b82f6" /> <!-- Right Node: Blue -->
+  <circle cx="60" cy="65" r="8" fill="#8b5cf6" />  <!-- Center Node: Purple -->
+</svg>
