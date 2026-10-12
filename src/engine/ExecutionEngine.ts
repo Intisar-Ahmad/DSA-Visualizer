@@ -17,6 +17,7 @@ export class ExecutionEngine {
   private heap: Record<string, HeapObject> = {};
   private consoleOutput: string[] = [];
   private code = '';
+  private codeLines: string[] = [];
 
   // THE MEMORY REGISTRY: Maps real JS objects to their hex address
   private trackedObjects = new Map<any, string>();
@@ -27,6 +28,7 @@ export class ExecutionEngine {
 
   analyze(code: string): ExecutionStep[] {
     this.code = code;
+    this.codeLines = code.split('\n');
     this.steps = [];
     this.callStack = [];
     this.executionContext = [];
@@ -42,7 +44,6 @@ export class ExecutionEngine {
     return '0x' + Math.floor(Math.random() * 65536).toString(16).padStart(4, '0').toUpperCase();
   }
 
-  // Ensures an object only ever gets one address in memory
   private registerObject(obj: any): string {
     if (this.trackedObjects.has(obj)) {
       return this.trackedObjects.get(obj)!;
@@ -52,19 +53,16 @@ export class ExecutionEngine {
     return address;
   }
 
-  // Iterates through all memory, updating the heap and converting nested objects to Pointers
   private syncHeap() {
     this.heap = {};
     for (const [obj, address] of this.trackedObjects.entries()) {
       let objType = Array.isArray(obj) ? 'Array' : 'Object';
       if (!Array.isArray(obj) && obj.constructor && obj.constructor.name !== 'Object') {
-        objType = obj.constructor.name; // Grabs custom class names like 'Node'
+        objType = obj.constructor.name;
       }
 
       const safeData = JSON.stringify(obj, (key, val) => {
-        if (key === '') return val; // Always return the root object itself
-        
-        // If a property points to another object, return its POINTER instead!
+        if (key === '') return val; 
         if (val !== null && typeof val === 'object') {
           return this.registerObject(val); 
         }
@@ -80,7 +78,6 @@ export class ExecutionEngine {
     activeLine: number,
     changes: StepChange[] = []
   ): void {
-    // Force the heap to sync and update pointers right before we take the picture
     this.syncHeap();
 
     this.steps.push({
@@ -100,6 +97,14 @@ export class ExecutionEngine {
     });
   }
 
+  private formatValue(val: any): string {
+    if (val === null) return 'null';
+    if (typeof val === 'undefined') return 'undefined';
+    if (typeof val === 'object') return Array.isArray(val) ? '[Array]' : `{${val.constructor?.name || 'Object'}}`;
+    if (typeof val === 'string') return `"${val}"`;
+    return String(val);
+  }
+
   private simulateExecution() {
     this.executionContext.push({
       id: nextId(),
@@ -116,27 +121,32 @@ export class ExecutionEngine {
 
       const sandboxEnv = {
         __step: (lineNum: number) => {
-          this.snapshot(`Executing line ${lineNum}`, lineNum, []);
+          if (lineNum > 0) {
+            const codeText = this.codeLines[lineNum - 1]?.trim() || '';
+            this.snapshot(`[Line ${lineNum}] Executing: ${codeText}`, lineNum, []);
+          }
         },
         
-        __pushFrame: (name: string, lineNum: number, args: any[] = []) => {
-          const formattedArgs = args.map(a => {
-            if (a === null) return 'null';
-            if (typeof a === 'object') return Array.isArray(a) ? '[Array]' : `{${a.constructor?.name || 'Object'}}`;
-            if (typeof a === 'string') return `"${a}"`;
-            return String(a);
+        __pushFrame: (name: string, lineNum: number, paramPairs: [string, any][] = []) => {
+          // Format parameters to display `factorial(n=5)`
+          const formattedArgs = paramPairs.map(([pName, pVal]) => {
+            return `${pName}=${this.formatValue(pVal)}`;
           }).join(', ');
 
           const frameName = `${name}(${formattedArgs})`;
           this.callStack.push({ id: nextId(), name: frameName, line:lineNum });
           this.executionContext.push({ id: nextId(), name: frameName, type: 'function', variables: {}, line: lineNum });
+          
           this.snapshot(`${frameName} added to Call Stack.`, lineNum, [{ type: 'stack_push' }]);
         },
 
         __popFrame: (name: string, lineNum: number) => {
           const popped = this.callStack.pop();
           this.executionContext.pop();
-          this.snapshot(`${popped?.name || name} popped off Call Stack.`, lineNum, [{ type: 'stack_pop' }]);
+          // We only take a snapshot here if the stack isn't already empty (prevents double logging on returns)
+          if (popped) {
+            this.snapshot(`${popped.name} popped off Call Stack.`, lineNum, [{ type: 'stack_pop' }]);
+          }
         },
 
         __setVar: (name: string, value: any, lineNum: number) => {
@@ -146,17 +156,22 @@ export class ExecutionEngine {
           if (value !== null && typeof value === 'object') {
             const address = this.registerObject(value);
             frame.variables[name] = address;
-            this.snapshot(`Allocated ${name} in heap at ${address}`, lineNum, [{ type: 'heap_allocate' }]);
+            this.snapshot(`[Line ${lineNum}] Allocated ${name} in heap at ${address}`, lineNum, [{ type: 'heap_allocate' }]);
           } else {
             frame.variables[name] = String(value);
-            this.snapshot(`Assigned ${name} = ${value}`, lineNum, []);
+            this.snapshot(`[Line ${lineNum}] Assigned ${name} = ${value}`, lineNum, []);
           }
           return value;
         },
 
-        // This catches `head.next = second` mutations!
         __trackAssign: (value: any, lineNum: number) => {
-          this.snapshot(`Property mutated in Heap memory.`, lineNum, []);
+          const codeText = this.codeLines[lineNum - 1]?.trim() || '';
+          this.snapshot(`[Line ${lineNum}] Property mutated: ${codeText}`, lineNum, []);
+          return value;
+        },
+
+        __trackReturn: (value: any, lineNum: number) => {
+          this.snapshot(`[Line ${lineNum}] Returning value: ${this.formatValue(value)}`, lineNum, []);
           return value;
         },
 
@@ -165,7 +180,7 @@ export class ExecutionEngine {
             const output = args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ');
             this.consoleOutput.push(`> ${output}`);
             const currentLine = this.steps[this.steps.length - 1]?.activeLine || 0;
-            this.snapshot(`Console log output: ${output}`, currentLine, [{ type: 'console_log', value: output }]);
+            this.snapshot(`[Line ${currentLine}] Console log: ${output}`, currentLine, [{ type: 'console_log', value: output }]);
           }
         }
       };
