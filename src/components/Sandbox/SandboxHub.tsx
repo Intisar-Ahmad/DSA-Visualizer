@@ -1,12 +1,13 @@
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Box, Braces, GitBranch, Layers, ListTree, Search, ArrowDownUp, Network } from 'lucide-react';
+import { ArrowLeft, Box, Braces, GitBranch, Layers, ListTree, Search, ArrowDownUp, Network, Rows } from 'lucide-react';
 
 const DATA_STRUCTURES = [
   { id: 'arrays', name: 'Arrays', icon: <Box size={24} />, color: 'text-blue-500', bg: 'bg-blue-500/10' },
   { id: 'linked-lists', name: 'Linked Lists', icon: <GitBranch size={24} />, color: 'text-purple-500', bg: 'bg-purple-500/10' },
   { id: 'trees', name: 'Trees', icon: <ListTree size={24} />, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
   { id: 'graphs', name: 'Graphs', icon: <Network size={24} />, color: 'text-pink-500', bg: 'bg-pink-500/10' },
-  { id: 'stacks-queues', name: 'Stacks & Queues', icon: <Layers size={24} />, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+  { id: 'stacks', name: 'Stacks', icon: <Layers size={24} />, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+  { id: 'queues', name: 'Queues', icon: <Rows size={24} />, color: 'text-orange-500', bg: 'bg-orange-500/10' },
   { id: 'hash-maps', name: 'Hash Maps', icon: <Braces size={24} />, color: 'text-cyan-500', bg: 'bg-cyan-500/10' },
 ];
 
