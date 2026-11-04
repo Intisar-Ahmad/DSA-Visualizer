@@ -13,20 +13,20 @@ import {
   generateBubbleSort, generateSelectionSort, generateInsertionSort, generateMergeSort, generateQuickSort,
   generateLinearSearch, generateBinarySearch,
   generateArrayCreation, generateArrayTraversal, generateArrayInsertion, generateArrayDeletion 
-} from '../../lib/generators/arrays';
-import { generateLLCreation, generateLLTraversal, generateLLInsertion, generateLLDeletion } from '../../lib/generators/linkedLists';
-import { generateDLLCreation, generateDLLTraversal, generateDLLInsertion, generateDLLDeletion } from '../../lib/generators/doublyLinkedLists';
-import { generateCLLCreation, generateCLLTraversal, generateCLLInsertion, generateCLLDeletion } from '../../lib/generators/circularLinkedLists';
-import { generateDCLLCreation, generateDCLLTraversal, generateDCLLInsertion, generateDCLLDeletion } from '../../lib/generators/doublyCircularLinkedLists';
-import { generateBSTCreation, generateBSTSearch, generateBSTInsertion, generateBSTDeletion } from '../../lib/generators/trees';
-import { generateAVLCreation, generateAVLSearch, generateAVLInsertion, generateAVLDeletion } from '../../lib/generators/avlTrees';
-import { generateRBCreation, generateRBSearch, generateRBInsertion, generateRBDeletion } from '../../lib/generators/redBlackTrees';
-import { generateHeapCreation, generateHeapSearch, generateHeapInsertion, generateHeapDeletion } from '../../lib/generators/heaps';
-import { generateGraphCreation, generateGraphModify, generateGraphTraversalDummy } from '../../lib/generators/graphs';
-import { generateGraphBFS, generateGraphDFS } from '../../lib/generators/graphAlgos';
-import { generateStackCreation, generateStackPush, generateStackPop, generateQueueCreation, generateQueueEnqueue, generateQueueDequeue } from '../../lib/generators/stacksAndQueues';
-import { generateHashmapCreation, generateHashmapGet, generateHashmapPut, generateHashmapRemove } from '../../lib/generators/hashMaps';
-import { generatePreOrder, generateInOrder, generatePostOrder, generateBFS, generateDFS } from '../../lib/generators/treeAlgos';
+} from '../../lib/generators/arrays.ts';
+import { generateLLCreation, generateLLTraversal, generateLLInsertion, generateLLDeletion } from '../../lib/generators/linkedLists.ts';
+import { generateDLLCreation, generateDLLTraversal, generateDLLInsertion, generateDLLDeletion } from '../../lib/generators/doublyLinkedLists.ts';
+import { generateCLLCreation, generateCLLTraversal, generateCLLInsertion, generateCLLDeletion } from '../../lib/generators/circularLinkedLists.ts';
+import { generateDCLLCreation, generateDCLLTraversal, generateDCLLInsertion, generateDCLLDeletion } from '../../lib/generators/doublyCircularLinkedLists.ts';
+import { generateBSTCreation, generateBSTSearch, generateBSTInsertion, generateBSTDeletion } from '../../lib/generators/trees.ts';
+import { generateAVLCreation, generateAVLSearch, generateAVLInsertion, generateAVLDeletion } from '../../lib/generators/avlTrees.ts';
+import { generateRBCreation, generateRBSearch, generateRBInsertion, generateRBDeletion } from '../../lib/generators/redBlackTrees.ts';
+import { generateHeapCreation, generateHeapSearch, generateHeapInsertion, generateHeapDeletion } from '../../lib/generators/heaps.ts';
+import { generateGraphCreation, generateGraphModify, generateGraphTraversalDummy } from '../../lib/generators/graphs.ts';
+import { generateGraphBFS, generateGraphDFS } from '../../lib/generators/graphAlgos.ts';
+import { generateStackCreation, generateStackPush, generateStackPop, generateQueueCreation, generateQueueEnqueue, generateQueueDequeue } from '../../lib/generators/stacksAndQueues.ts';
+import { generateHashmapCreation, generateHashmapGet, generateHashmapPut, generateHashmapRemove } from '../../lib/generators/hashMaps.ts';
+import { generatePreOrder, generateInOrder, generatePostOrder, generateBFS, generateDFS } from '../../lib/generators/treeAlgos.ts';
 
 const MODULES: Record<string, any> = {
   'arrays': {
