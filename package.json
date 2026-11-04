@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "author": "Gouranga Das Samrat",
+  "author": "Intisar Ahmad",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

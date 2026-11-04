@@ -11,7 +11,7 @@ export type PhaseType =
 export interface ExecutionFrame {
   id: string;
   name: string;
-  type: 'global' | 'function';
+  type: 'global' | 'function' | 'async';
   variables: Record<string, string>;
   line: number;
 }
@@ -22,9 +22,8 @@ export interface CallStackEntry {
   line: number;
 }
 
-// NEW: We will use this to track objects/arrays in memory
 export interface HeapObject {
-  address: string; // e.g., "0x7F4A"
+  address: string;
   type: 'array' | 'object';
   data: string;
 }
@@ -37,7 +36,7 @@ export interface ExecutionStep {
   activeLine: number;
   callStack: CallStackEntry[];
   executionContext: ExecutionFrame[];
-  heap: Record<string, HeapObject>; // Added the Heap!
+  heap: Record<string, HeapObject>;
   consoleOutput: string[];
   changes: StepChange[];
 }
